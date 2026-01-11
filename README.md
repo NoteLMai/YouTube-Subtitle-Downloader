@@ -9,16 +9,16 @@
 </p>
 
 <p align="center">
-  <a href="https://chrome.google.com/webstore">
+  <a href="https://github.com/NoteLMai/YouTube-Subtitle-Downloader">
     <img src="https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Extension">
   </a>
-  <img src="https://img.shields.io/badge/Version-1.0.0-brightgreen" alt="Version 1.0.0">
+  <img src="https://img.shields.io/badge/Version-1.2.0-brightgreen" alt="Version 1.2.0">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT License">
   <img src="https://img.shields.io/badge/Languages-70+-purple" alt="70+ Languages">
 </p>
 
 <p align="center">
-  <a href="https://chrome.google.com/webstore">Add to Chrome</a> •
+  <a href="https://github.com/NoteLMai/YouTube-Subtitle-Downloader">Add to Chrome</a> •
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
@@ -49,9 +49,10 @@
 
 ### 🎯 Core Features
 
-- **One-Click Download**: Click the extension icon to instantly download subtitles in SRT format
-- **Multiple Export Formats**: Choose between SRT (with timestamps), TXT (plain text), or copy to clipboard
+- **One-Click Download**: Click the extension icon to instantly download subtitles in your selected format
+- **Multiple Export Formats**: Choose between SRT (with timestamps), TXT (plain text), or copy to clipboard via right-click menu
 - **70+ Language Support**: Select from any language YouTube provides via the right-click context menu
+- **Persistent Preferences**: Your format and language choices are saved and remembered across sessions
 - **Smart File Naming**: Files automatically include video title and language code (e.g., `Video_Title_en.srt`)
 - **Toast Notifications**: Visual feedback confirms successful downloads, copies, or errors
 
@@ -78,7 +79,7 @@
 
 ### From Chrome Web Store (Recommended)
 
-1. Visit the [Chrome Web Store](https://chrome.google.com/webstore) (link coming soon)
+1. Visit the [Chrome Web Store](https://github.com/NoteLMai/YouTube-Subtitle-Downloader) (link coming soon)
 2. Click **Add to Chrome**
 3. Confirm the installation when prompted
 4. The extension icon appears in your browser toolbar
@@ -101,32 +102,35 @@
 
 ## Usage
 
-### Quick Download (One-Click SRT)
+### Quick Download (One-Click)
 
 1. Navigate to any YouTube video that has subtitles or captions
 2. **Play the video briefly** (even for 1-2 seconds) to trigger subtitle loading
 3. Click the extension icon in your browser toolbar
-4. Your SRT file downloads automatically with the video title as filename
+4. Subtitles download in your selected format and language (default: SRT, Auto language)
 
 ### Right-Click Context Menu
 
-Right-click the extension icon to access all options:
+Right-click the extension icon to configure format and language preferences:
 
-#### 📄 Format Menu
-
-| Option | Action |
-|--------|--------|
-| **SRT (with timestamps)** | Download subtitles with full timing information |
-| **TXT (plain text)** | Download clean text without timestamps |
-| **Copy to clipboard** | Copy subtitle text directly—no file download |
-
-#### 🌍 Language Menu
+#### 📄 Format Menu (Radio Selection)
 
 | Option | Description |
 |--------|-------------|
-| **✓ Auto (current subtitle)** | Downloads whatever language is currently displayed |
-| **30 Common Languages** | Quick access to English, Spanish, Japanese, Chinese, etc. |
-| **All 70+ YouTube Languages** | Use "Auto" with YouTube's language settings for any language |
+| **● SRT (with timestamps)** | Standard subtitle format with timing (default) |
+| **○ TXT (plain text)** | Clean text without timestamps |
+| **○ Copy to clipboard** | Copy text directly—no file download |
+
+*Select your preferred format, then click the icon to execute.*
+
+#### 🌍 Language Menu (Radio Selection)
+
+| Option | Description |
+|--------|-------------|
+| **● Auto (current subtitle)** | Downloads whatever language is currently displayed (default) |
+| **○ 30 Common Languages** | Quick access to English, Spanish, Japanese, Chinese, etc. |
+
+*Select your preferred language, then click the icon to download.*
 
 ### Download Workflow Examples
 
@@ -136,16 +140,22 @@ Right-click the extension icon to access all options:
 3. Click extension icon
 4. File downloads: `Video_Title_en.srt`
 
-**Example 2: Copy Japanese Subtitles**
+**Example 2: Copy Japanese Subtitles to Clipboard**
 1. Go to YouTube video → Play briefly
-2. Right-click extension icon → Language → Japanese
-3. Right-click extension icon → Format → Copy to clipboard
-4. Paste anywhere with Ctrl+V / Cmd+V
+2. Right-click extension icon → Format → Copy to clipboard
+3. Right-click extension icon → Language → Japanese
+4. Click extension icon
+5. Paste anywhere with Ctrl+V / Cmd+V
 
 **Example 3: Download Multiple Languages**
 1. Select first language → Click icon → Download
 2. Select second language → Click icon → Download
 3. Each file is named with its language code
+
+**Example 4: Download TXT for AI Tools**
+1. Right-click extension icon → Format → TXT (plain text)
+2. Click extension icon on any video
+3. Clean text file ready for ChatGPT, Claude, etc.
 
 ---
 
@@ -436,7 +446,18 @@ Built with ❤️ by [NoteLM.ai](https://notelm.ai) - Your AI-powered note-takin
 
 ## Version History
 
-### v1.0.0 (Current Release)
+### v1.2.0 (January 2026) - Current Release
+- ✨ Format menu now uses radio selection (same as Language menu)
+- 💾 Format and language preferences are now persistent across sessions
+- 🎯 Click extension icon to download using your saved preferences
+- 🔧 Improved UX consistency between Format and Language menus
+
+### v1.1.0 (January 2026)
+- 🔧 Performance improvements
+- 🐛 Bug fixes and stability enhancements
+- 🔗 Updated website integration links
+
+### v1.0.0 (2024)
 - 🎉 Initial public release
 - ✨ One-click subtitle download in SRT format
 - 📄 Multiple export formats: SRT, TXT, Clipboard

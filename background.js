@@ -3,6 +3,7 @@
 const STORAGE_KEY = 'yt_subtitle_url';
 const STORAGE_TRACKS_KEY = 'yt_subtitle_tracks';
 const STORAGE_SELECTED_LANG_KEY = 'yt_selected_lang';
+const STORAGE_SELECTED_FORMAT_KEY = 'yt_selected_format';
 
 // Common languages for quick access menu (subset of YouTube's 70+ supported languages)
 const COMMON_LANGUAGES = [
@@ -44,7 +45,12 @@ chrome.runtime.onInstalled.addListener(() => {
   createContextMenus();
 });
 
-function createContextMenus() {
+async function createContextMenus() {
+  // Get saved preferences
+  const result = await chrome.storage.local.get([STORAGE_SELECTED_FORMAT_KEY, STORAGE_SELECTED_LANG_KEY]);
+  const savedFormat = result[STORAGE_SELECTED_FORMAT_KEY] || 'srt';
+  const savedLang = result[STORAGE_SELECTED_LANG_KEY] || null;
+  
   // Clear existing menus first
   chrome.contextMenus.removeAll(() => {
     // === FORMAT SUBMENU ===
@@ -55,24 +61,30 @@ function createContextMenus() {
     });
 
     chrome.contextMenus.create({
-      id: 'download-srt',
+      id: 'format-srt',
       parentId: 'format-menu',
       title: 'SRT (with timestamps)',
-      contexts: ['action']
+      contexts: ['action'],
+      type: 'radio',
+      checked: savedFormat === 'srt'
     });
 
     chrome.contextMenus.create({
-      id: 'download-txt',
+      id: 'format-txt',
       parentId: 'format-menu',
       title: 'TXT (plain text)',
-      contexts: ['action']
+      contexts: ['action'],
+      type: 'radio',
+      checked: savedFormat === 'txt'
     });
 
     chrome.contextMenus.create({
-      id: 'copy-text',
+      id: 'format-clipboard',
       parentId: 'format-menu',
       title: 'Copy to clipboard',
-      contexts: ['action']
+      contexts: ['action'],
+      type: 'radio',
+      checked: savedFormat === 'clipboard'
     });
 
     // === LANGUAGE SUBMENU ===
@@ -86,10 +98,10 @@ function createContextMenus() {
     chrome.contextMenus.create({
       id: 'lang-auto',
       parentId: 'language-menu',
-      title: '✓ Auto (current subtitle)',
+      title: 'Auto (current subtitle)',
       contexts: ['action'],
       type: 'radio',
-      checked: true
+      checked: savedLang === null
     });
 
     chrome.contextMenus.create({
@@ -107,7 +119,7 @@ function createContextMenus() {
         title: lang.name,
         contexts: ['action'],
         type: 'radio',
-        checked: false
+        checked: savedLang === lang.code
       });
     }
   });
@@ -138,13 +150,18 @@ chrome.webRequest.onBeforeRequest.addListener(
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (!tab?.url?.includes('youtube.com/watch')) return;
+  const menuId = info.menuItemId.toString();
   
-  const menuId = info.menuItemId;
+  // Handle format selection (radio buttons - just save preference)
+  if (menuId.startsWith('format-')) {
+    const format = menuId.replace('format-', '');
+    await chrome.storage.local.set({ [STORAGE_SELECTED_FORMAT_KEY]: format });
+    return;
+  }
   
-  // Handle language selection
-  if (menuId.toString().startsWith('lang-')) {
-    const langCode = menuId.toString().replace('lang-', '');
+  // Handle language selection (radio buttons - just save preference)
+  if (menuId.startsWith('lang-')) {
+    const langCode = menuId.replace('lang-', '');
     if (langCode === 'auto') {
       await chrome.storage.local.remove(STORAGE_SELECTED_LANG_KEY);
     } else {
@@ -152,41 +169,32 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
     return;
   }
-  
-  // Handle format selection (download/copy)
-  const result = await chrome.storage.local.get([STORAGE_KEY, STORAGE_SELECTED_LANG_KEY]);
-  if (!result[STORAGE_KEY]) return;
-  
-  let messageType;
-  switch (menuId) {
-    case 'download-srt':
-      messageType = 'DOWNLOAD_SRT';
-      break;
-    case 'download-txt':
-      messageType = 'DOWNLOAD_TXT';
-      break;
-    case 'copy-text':
-      messageType = 'COPY_TEXT';
-      break;
-    default:
-      return;
-  }
-  
-  chrome.tabs.sendMessage(tab.id, { 
-    type: messageType, 
-    url: result[STORAGE_KEY],
-    targetLang: result[STORAGE_SELECTED_LANG_KEY] || null
-  });
 });
 
-// Handle extension icon click - default to SRT download with selected language
+// Handle extension icon click - use selected format and language
 chrome.action.onClicked.addListener(async (tab) => {
   if (!tab.url?.includes('youtube.com/watch')) return;
 
-  const result = await chrome.storage.local.get([STORAGE_KEY, STORAGE_SELECTED_LANG_KEY]);
+  const result = await chrome.storage.local.get([STORAGE_KEY, STORAGE_SELECTED_LANG_KEY, STORAGE_SELECTED_FORMAT_KEY]);
   if (result[STORAGE_KEY]) {
+    // Determine message type based on selected format (default to SRT)
+    const format = result[STORAGE_SELECTED_FORMAT_KEY] || 'srt';
+    let messageType;
+    switch (format) {
+      case 'txt':
+        messageType = 'DOWNLOAD_TXT';
+        break;
+      case 'clipboard':
+        messageType = 'COPY_TEXT';
+        break;
+      case 'srt':
+      default:
+        messageType = 'DOWNLOAD_SRT';
+        break;
+    }
+    
     chrome.tabs.sendMessage(tab.id, { 
-      type: 'DOWNLOAD_SRT', 
+      type: messageType, 
       url: result[STORAGE_KEY],
       targetLang: result[STORAGE_SELECTED_LANG_KEY] || null
     });
