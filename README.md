@@ -12,7 +12,7 @@
   <a href="https://github.com/NoteLMai/YouTube-Subtitle-Downloader">
     <img src="https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Extension">
   </a>
-  <img src="https://img.shields.io/badge/Version-1.2.0-brightgreen" alt="Version 1.2.0">
+  <img src="https://img.shields.io/badge/Version-1.3.0-brightgreen" alt="Version 1.3.0">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="MIT License">
   <img src="https://img.shields.io/badge/Languages-70+-purple" alt="70+ Languages">
 </p>
@@ -51,7 +51,8 @@
 
 - **One-Click Download**: Click the extension icon to instantly download subtitles in your selected format
 - **Multiple Export Formats**: Choose between SRT (with timestamps), TXT (plain text), or copy to clipboard via right-click menu
-- **70+ Language Support**: Select from any language YouTube provides via the right-click context menu
+- **Dynamic Language Detection**: Menu shows only languages actually available for the current video
+- **Separate Manual & Auto-generated**: Clearly distinguishes between uploaded subtitles and YouTube's auto-generated captions
 - **Persistent Preferences**: Your format and language choices are saved and remembered across sessions
 - **Smart File Naming**: Files automatically include video title and language code (e.g., `Video_Title_en.srt`)
 - **Toast Notifications**: Visual feedback confirms successful downloads, copies, or errors
@@ -123,13 +124,15 @@ Right-click the extension icon to configure format and language preferences:
 
 *Select your preferred format, then click the icon to execute.*
 
-#### 🌍 Language Menu (Radio Selection)
+#### 🌍 Language Menu (Dynamic)
 
 | Option | Description |
 |--------|-------------|
 | **● Auto (current subtitle)** | Downloads whatever language is currently displayed (default) |
-| **○ 30 Common Languages** | Quick access to English, Spanish, Japanese, Chinese, etc. |
+| **── Subtitles ──** | Manually uploaded subtitles (when available) |
+| **── Auto-generated ──** | YouTube's auto-generated captions (ASR) |
 
+*Menu dynamically shows only languages available for the current video.*
 *Select your preferred language, then click the icon to download.*
 
 ### Download Workflow Examples
@@ -446,7 +449,14 @@ Built with ❤️ by [NoteLM.ai](https://notelm.ai) - Your AI-powered note-takin
 
 ## Version History
 
-### v1.2.0 (January 2026) - Current Release
+### v1.3.0 (January 2026) - Current Release
+- 🎯 **Dynamic Language Detection**: Language menu now shows only available languages for current video
+- 🔍 Extracts subtitle info directly from YouTube's `playerCaptionsTracklistRenderer`
+- 📝 Separates manual subtitles and auto-generated captions in menu
+- 🔄 Auto-updates when navigating between videos (YouTube SPA support)
+- ⚡ More accurate language detection from YouTube's player response
+
+### v1.2.0 (January 2026)
 - ✨ Format menu now uses radio selection (same as Language menu)
 - 💾 Format and language preferences are now persistent across sessions
 - 🎯 Click extension icon to download using your saved preferences

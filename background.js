@@ -4,41 +4,11 @@ const STORAGE_KEY = 'yt_subtitle_url';
 const STORAGE_TRACKS_KEY = 'yt_subtitle_tracks';
 const STORAGE_SELECTED_LANG_KEY = 'yt_selected_lang';
 const STORAGE_SELECTED_FORMAT_KEY = 'yt_selected_format';
+const STORAGE_AVAILABLE_LANGS_KEY = 'yt_available_langs';
 
-// Common languages for quick access menu (subset of YouTube's 70+ supported languages)
-const COMMON_LANGUAGES = [
-  // Top 30 most commonly used languages
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'pt', name: 'Portuguese' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'it', name: 'Italian' },
-  { code: 'nl', name: 'Dutch' },
-  { code: 'pl', name: 'Polish' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'uk', name: 'Ukrainian' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ko', name: 'Korean' },
-  { code: 'zh-CN', name: 'Chinese (Simplified)' },
-  { code: 'zh-TW', name: 'Chinese (Traditional)' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'bn', name: 'Bengali' },
-  { code: 'id', name: 'Indonesian' },
-  { code: 'ms', name: 'Malay' },
-  { code: 'vi', name: 'Vietnamese' },
-  { code: 'th', name: 'Thai' },
-  { code: 'tr', name: 'Turkish' },
-  { code: 'fil', name: 'Filipino' },
-  { code: 'sv', name: 'Swedish' },
-  { code: 'da', name: 'Danish' },
-  { code: 'no', name: 'Norwegian' },
-  { code: 'fi', name: 'Finnish' },
-  { code: 'cs', name: 'Czech' },
-  { code: 'el', name: 'Greek' },
-  { code: 'he', name: 'Hebrew' },
-];
+// Track current video's available languages
+let currentVideoLanguages = null;
+let currentVideoId = null;
 
 // Create context menu items on install
 chrome.runtime.onInstalled.addListener(() => {
@@ -87,10 +57,10 @@ async function createContextMenus() {
       checked: savedFormat === 'clipboard'
     });
 
-    // === LANGUAGE SUBMENU ===
+    // === LANGUAGE SUBMENU (Dynamic) ===
     chrome.contextMenus.create({
       id: 'language-menu',
-      title: '🌍 Language (70+ supported)',
+      title: '🌍 Language',
       contexts: ['action']
     });
 
@@ -111,17 +81,168 @@ async function createContextMenus() {
       contexts: ['action']
     });
 
-    // Common languages as radio buttons
-    for (const lang of COMMON_LANGUAGES) {
-      chrome.contextMenus.create({
-        id: `lang-${lang.code}`,
-        parentId: 'language-menu',
-        title: lang.name,
-        contexts: ['action'],
-        type: 'radio',
-        checked: savedLang === lang.code
+    // Placeholder when no video is loaded
+    chrome.contextMenus.create({
+      id: 'lang-placeholder',
+      parentId: 'language-menu',
+      title: '(Play a video to see available languages)',
+      contexts: ['action'],
+      enabled: false
+    });
+  });
+}
+
+/**
+ * Update language menu with available languages from current video
+ * Source: captions.playerCaptionsTracklistRenderer.captionTracks
+ */
+async function updateLanguageMenu(languages, videoId) {
+  // Skip if same video
+  if (videoId === currentVideoId && currentVideoLanguages) return;
+  
+  currentVideoId = videoId;
+  currentVideoLanguages = languages;
+  
+  const result = await chrome.storage.local.get([STORAGE_SELECTED_LANG_KEY]);
+  const savedLang = result[STORAGE_SELECTED_LANG_KEY] || null;
+  
+  // Remove old language items (keep format menu and lang-auto)
+  const menuIdsToRemove = [];
+  
+  // We need to recreate the language submenu items
+  // First, remove all dynamic language items
+  return new Promise((resolve) => {
+    chrome.contextMenus.removeAll(() => {
+      // Recreate format menu
+      chrome.storage.local.get([STORAGE_SELECTED_FORMAT_KEY], (result) => {
+        const savedFormat = result[STORAGE_SELECTED_FORMAT_KEY] || 'srt';
+        
+        // === FORMAT SUBMENU ===
+        chrome.contextMenus.create({
+          id: 'format-menu',
+          title: '📄 Format',
+          contexts: ['action']
+        });
+
+        chrome.contextMenus.create({
+          id: 'format-srt',
+          parentId: 'format-menu',
+          title: 'SRT (with timestamps)',
+          contexts: ['action'],
+          type: 'radio',
+          checked: savedFormat === 'srt'
+        });
+
+        chrome.contextMenus.create({
+          id: 'format-txt',
+          parentId: 'format-menu',
+          title: 'TXT (plain text)',
+          contexts: ['action'],
+          type: 'radio',
+          checked: savedFormat === 'txt'
+        });
+
+        chrome.contextMenus.create({
+          id: 'format-clipboard',
+          parentId: 'format-menu',
+          title: 'Copy to clipboard',
+          contexts: ['action'],
+          type: 'radio',
+          checked: savedFormat === 'clipboard'
+        });
+
+        // === LANGUAGE SUBMENU ===
+        const totalLangs = (languages.manual?.length || 0) + (languages.automatic?.length || 0);
+        chrome.contextMenus.create({
+          id: 'language-menu',
+          title: `🌍 Language (${totalLangs} available)`,
+          contexts: ['action']
+        });
+
+        // Auto-detect option
+        chrome.contextMenus.create({
+          id: 'lang-auto',
+          parentId: 'language-menu',
+          title: 'Auto (current subtitle)',
+          contexts: ['action'],
+          type: 'radio',
+          checked: savedLang === null
+        });
+
+        // Add manual subtitles section if available
+        if (languages.manual && languages.manual.length > 0) {
+          chrome.contextMenus.create({
+            id: 'lang-separator-manual',
+            parentId: 'language-menu',
+            type: 'separator',
+            contexts: ['action']
+          });
+          
+          chrome.contextMenus.create({
+            id: 'lang-header-manual',
+            parentId: 'language-menu',
+            title: '── Subtitles ──',
+            contexts: ['action'],
+            enabled: false
+          });
+
+          for (const lang of languages.manual) {
+            chrome.contextMenus.create({
+              id: `lang-${lang.code}`,
+              parentId: 'language-menu',
+              title: lang.name || lang.code,
+              contexts: ['action'],
+              type: 'radio',
+              checked: savedLang === lang.code
+            });
+          }
+        }
+
+        // Add automatic captions section if available
+        if (languages.automatic && languages.automatic.length > 0) {
+          chrome.contextMenus.create({
+            id: 'lang-separator-auto',
+            parentId: 'language-menu',
+            type: 'separator',
+            contexts: ['action']
+          });
+          
+          chrome.contextMenus.create({
+            id: 'lang-header-auto',
+            parentId: 'language-menu',
+            title: '── Auto-generated ──',
+            contexts: ['action'],
+            enabled: false
+          });
+
+          for (const lang of languages.automatic) {
+            // Prefix with 'a-' to indicate auto-generated (ASR)
+            const menuId = `lang-a-${lang.code}`;
+            chrome.contextMenus.create({
+              id: menuId,
+              parentId: 'language-menu',
+              title: `${lang.name || lang.code}`,
+              contexts: ['action'],
+              type: 'radio',
+              checked: savedLang === `a-${lang.code}`
+            });
+          }
+        }
+
+        // If no languages found
+        if (totalLangs === 0) {
+          chrome.contextMenus.create({
+            id: 'lang-placeholder',
+            parentId: 'language-menu',
+            title: '(No subtitles available)',
+            contexts: ['action'],
+            enabled: false
+          });
+        }
+
+        resolve();
       });
-    }
+    });
   });
 }
 
@@ -204,9 +325,40 @@ chrome.action.onClicked.addListener(async (tab) => {
 // Listen for messages from content script to update available languages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'UPDATE_AVAILABLE_LANGUAGES') {
-    // Could dynamically update menu based on available languages
-    // For now, we use the static common languages list
-    sendResponse({ success: true });
+    // Dynamically update menu based on available languages
+    updateLanguageMenu(message.languages, message.videoId)
+      .then(() => {
+        // Store available languages
+        chrome.storage.local.set({ 
+          [STORAGE_AVAILABLE_LANGS_KEY]: message.languages 
+        });
+        sendResponse({ success: true });
+      })
+      .catch((err) => {
+        console.error('Error updating language menu:', err);
+        sendResponse({ success: false, error: err.message });
+      });
+    return true; // Keep channel open for async response
   }
-  return true;
+  return false;
+});
+
+// Reset language menu when tab changes or closes
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const tab = await chrome.tabs.get(activeInfo.tabId);
+  if (!tab.url?.includes('youtube.com/watch')) {
+    // Reset to default menu when not on YouTube video
+    currentVideoId = null;
+    currentVideoLanguages = null;
+  }
+});
+
+// Reset when navigating away from video
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.url) {
+    if (!tab.url.includes('youtube.com/watch')) {
+      currentVideoId = null;
+      currentVideoLanguages = null;
+    }
+  }
 });
