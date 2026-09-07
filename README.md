@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/NoteLMai/YouTube-Subtitle-Downloader">
+  <a href="https://chromewebstore.google.com/detail/youtube-subtitle-download/ognjcegpcoafidcfbepkfgnolnnibcjp">
     <img src="https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Extension">
   </a>
   <img src="https://img.shields.io/badge/Version-1.3.0-brightgreen" alt="Version 1.3.0">
@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/NoteLMai/YouTube-Subtitle-Downloader">Add to Chrome</a> •
+  <a href="https://chromewebstore.google.com/detail/youtube-subtitle-download/ognjcegpcoafidcfbepkfgnolnnibcjp">Add to Chrome</a> •
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
@@ -80,7 +80,7 @@
 
 ### From Chrome Web Store (Recommended)
 
-1. Visit the [Chrome Web Store](https://github.com/NoteLMai/YouTube-Subtitle-Downloader) (link coming soon)
+1. Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/youtube-subtitle-download/ognjcegpcoafidcfbepkfgnolnnibcjp)
 2. Click **Add to Chrome**
 3. Confirm the installation when prompted
 4. The extension icon appears in your browser toolbar
@@ -389,8 +389,8 @@ Plain text output is automatically formatted for readability:
 ## Related Tools
 
 - **[YouTube Video Summarizer](../YouTube%20Video%20Summarizer/)** - AI-powered video summaries with chapters and timestamps
-- **[YouTube Transcript Generator](https://notelm.ai/tools/youtube-transcript-generator)** - Online tool to generate YouTube transcripts
-- **[NoteLM.ai](https://notelm.ai)** - Your AI-powered productivity companion
+- **[YouTube Transcript Generator](https://www.notelm.ai/youtube-transcript-generator)** - Online tool to generate YouTube transcripts
+- **[NoteLM.ai](https://www.notelm.ai)** - Your AI-powered productivity companion
 
 ---
 
@@ -401,7 +401,7 @@ Having issues or suggestions? We'd love to hear from you:
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/NoteLMai/YouTube-Subtitle-Downloader/issues)
 - 💡 **Feature Requests**: [GitHub Discussions](https://github.com/NoteLMai/YouTube-Subtitle-Downloader/discussions)
 - 📧 **Email**: hello@notelm.ai
-- 🌐 **Website**: [notelm.ai](https://notelm.ai)
+- 🌐 **Website**: [notelm.ai](https://www.notelm.ai)
 
 ---
 
@@ -437,11 +437,11 @@ SOFTWARE.
 
 ## Credits
 
-Built with ❤️ by [NoteLM.ai](https://notelm.ai) - Your AI-powered note-taking companion.
+Built with ❤️ by [NoteLM.ai](https://www.notelm.ai) - Your AI-powered note-taking companion.
 
 <p align="center">
-  <a href="https://notelm.ai">
-    <img src="https://notelm.ai/logo.svg" alt="NoteLM.ai" width="120">
+  <a href="https://www.notelm.ai">
+    <img src="https://www.notelm.ai/logo.svg" alt="NoteLM.ai" width="120">
   </a>
 </p>
 
